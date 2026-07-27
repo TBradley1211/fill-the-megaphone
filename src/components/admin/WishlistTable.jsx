@@ -142,17 +142,6 @@ function WishlistTable({
               </button>
             </div>
 
-            {item.amazon_url && (
-              <a
-                className="wishlist-amazon-link"
-                href={item.amazon_url}
-                target="_blank"
-                rel="noreferrer"
-              >
-                View Amazon Item
-              </a>
-            )}
-
             <div className="wishlist-admin-actions">
               <button
                 type="button"

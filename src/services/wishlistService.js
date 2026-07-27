@@ -11,7 +11,6 @@ export async function getActiveWishlistItems() {
       estimated_price,
       quantity_needed,
       quantity_purchased,
-      amazon_url,
       is_active,
       created_at,
       updated_at
@@ -19,9 +18,7 @@ export async function getActiveWishlistItems() {
     .eq("is_active", true)
     .order("created_at", { ascending: false });
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  if (error) throw new Error(error.message);
 
   return data ?? [];
 }
@@ -37,7 +34,6 @@ export async function getAllWishlistItems() {
       estimated_price,
       quantity_needed,
       quantity_purchased,
-      amazon_url,
       is_active,
       created_at,
       updated_at
@@ -45,9 +41,7 @@ export async function getAllWishlistItems() {
     .order("is_active", { ascending: false })
     .order("created_at", { ascending: false });
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  if (error) throw new Error(error.message);
 
   return data ?? [];
 }
@@ -58,7 +52,6 @@ export async function createWishlistItem({
   itemDescription,
   estimatedPrice,
   quantityNeeded,
-  amazonUrl,
 }) {
   const { data, error } = await supabase
     .from("wishlist_items")
@@ -68,18 +61,15 @@ export async function createWishlistItem({
       item_description: itemDescription.trim() || null,
       estimated_price:
         estimatedPrice === "" ? null : Number(estimatedPrice),
-      quantity_needed: Number(quantityNeeded),
+      quantity_needed: Math.max(Number(quantityNeeded), 1),
       quantity_purchased: 0,
-      amazon_url: amazonUrl.trim() || null,
       is_active: true,
       updated_at: new Date().toISOString(),
     })
     .select()
     .single();
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  if (error) throw new Error(error.message);
 
   return data;
 }
@@ -93,7 +83,6 @@ export async function updateWishlistItem(
     estimatedPrice,
     quantityNeeded,
     quantityPurchased,
-    amazonUrl,
     isActive,
   }
 ) {
@@ -114,7 +103,6 @@ export async function updateWishlistItem(
         estimatedPrice === "" ? null : Number(estimatedPrice),
       quantity_needed: needed,
       quantity_purchased: purchased,
-      amazon_url: amazonUrl.trim() || null,
       is_active: Boolean(isActive),
       updated_at: new Date().toISOString(),
     })
@@ -122,9 +110,7 @@ export async function updateWishlistItem(
     .select()
     .single();
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  if (error) throw new Error(error.message);
 
   return data;
 }
@@ -151,9 +137,7 @@ export async function updateWishlistPurchaseCount(
     .select()
     .single();
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  if (error) throw new Error(error.message);
 
   return data;
 }
@@ -169,9 +153,7 @@ export async function setWishlistItemActive(itemId, isActive) {
     .select()
     .single();
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  if (error) throw new Error(error.message);
 
   return data;
 }
@@ -182,7 +164,5 @@ export async function deleteWishlistItem(itemId) {
     .delete()
     .eq("id", itemId);
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  if (error) throw new Error(error.message);
 }

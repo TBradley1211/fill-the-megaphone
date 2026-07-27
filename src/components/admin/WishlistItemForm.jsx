@@ -7,7 +7,6 @@ const emptyForm = {
   estimatedPrice: "",
   quantityNeeded: 1,
   quantityPurchased: 0,
-  amazonUrl: "",
   isActive: true,
 };
 
@@ -34,7 +33,6 @@ function WishlistItemForm({
         quantityNeeded: editingItem.quantity_needed ?? 1,
         quantityPurchased:
           editingItem.quantity_purchased ?? 0,
-        amazonUrl: editingItem.amazon_url ?? "",
         isActive: editingItem.is_active,
       });
     } else {
@@ -219,21 +217,6 @@ function WishlistItemForm({
             />
           </label>
         )}
-
-        <label
-          className="wishlist-form-full"
-          htmlFor="wishlistAmazonUrl"
-        >
-          Amazon Link
-          <input
-            id="wishlistAmazonUrl"
-            name="amazonUrl"
-            type="url"
-            value={formData.amazonUrl}
-            onChange={handleChange}
-            placeholder="https://www.amazon.com/..."
-          />
-        </label>
 
         <label
           className="wishlist-form-full"
