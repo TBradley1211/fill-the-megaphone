@@ -15,6 +15,7 @@ import {
   getAllDonations,
   updateDonationStatus,
 } from "../services/donationService";
+import { sendDonationThankYouEmail } from "../services/emailService";
 import { getFundraiserSettings } from "../services/fundraiserService";
 import {
   createWishlistItem,
@@ -191,14 +192,51 @@ function Admin() {
         ? "Anonymous donation"
         : donation.donor_name;
 
+      if (newStatus === "verified") {
+        const formattedAmount = Number(
+          donation.amount
+        ).toLocaleString("en-US", {
+          style: "currency",
+          currency: "USD",
+        });
+
+        if (!donation.donor_email?.trim()) {
+          setDashboardMessage(
+            `${donorDisplayName}'s ${formattedAmount} donation was verified. No thank-you email was sent because no email address was provided.`
+          );
+          return;
+        }
+
+        try {
+          await sendDonationThankYouEmail({
+            donorName: donation.donor_name,
+            donorEmail: donation.donor_email,
+            donationAmount: donation.amount,
+            organizationName:
+              settings?.organization_name ||
+              "Division 3 Gators Cheer",
+          });
+
+          setDashboardMessage(
+            `${donorDisplayName}'s ${formattedAmount} donation was verified, and the thank-you email was sent.`
+          );
+        } catch (emailError) {
+          console.error(emailError);
+
+          setDashboardMessage(
+            `${donorDisplayName}'s ${formattedAmount} donation was verified.`
+          );
+
+          setDashboardError(
+            `The donation was verified, but the thank-you email could not be sent: ${emailError.message}`
+          );
+        }
+
+        return;
+      }
+
       setDashboardMessage(
-        newStatus === "verified"
-          ? `${donorDisplayName}'s $${Number(
-              donation.amount
-            ).toLocaleString(
-              "en-US"
-            )} donation was verified.`
-          : `${donorDisplayName}'s donation was rejected.`
+        `${donorDisplayName}'s donation was rejected.`
       );
     } catch (error) {
       console.error(error);
