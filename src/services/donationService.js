@@ -21,7 +21,8 @@ export async function getVerifiedDonationTotal() {
 }
 
 /**
- * Return the most recent verified supporters for the public Sponsor Wall.
+ * Return the most recent verified supporters
+ * for the public Sponsor Wall.
  */
 export async function getRecentVerifiedSupporters(
   limit = 6
@@ -75,7 +76,7 @@ export async function getVerifiedSupporterCount() {
 
 /**
  * Return the newest verified supporter.
- * This is used for the new-supporter celebration banner.
+ * Used for the new-supporter celebration banner.
  */
 export async function getLatestVerifiedSupporter() {
   const { data, error } = await supabase
@@ -105,6 +106,11 @@ export async function getLatestVerifiedSupporter() {
 
 /**
  * Submit a new sponsorship as pending.
+ *
+ * Important:
+ * This insert does not call .select() afterward.
+ * Public users can insert pending donations, but they
+ * are not allowed to read pending donation records.
  */
 export async function submitDonation({
   categoryId,
@@ -159,7 +165,7 @@ export async function submitDonation({
     );
   }
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from("donations")
     .insert({
       category_id: categoryId,
@@ -174,15 +180,20 @@ export async function submitDonation({
         cleanDedicationType || null,
       dedication_name:
         cleanDedicationName || null,
-    })
-    .select()
-    .single();
+    });
 
   if (error) {
+    console.error(
+      "Donation submission error:",
+      error
+    );
+
     throw new Error(error.message);
   }
 
-  return data;
+  return {
+    success: true,
+  };
 }
 
 /**
@@ -217,7 +228,8 @@ export async function getAllDonations() {
 }
 
 /**
- * Update a donation's payment status from the admin dashboard.
+ * Update a donation's payment status
+ * from the admin dashboard.
  */
 export async function updateDonationStatus(
   donationId,
@@ -260,23 +272,26 @@ export async function updateDonationStatus(
 }
 
 /**
- * Return the total number of recorded fundraiser shares.
+ * Return the total number of recorded
+ * fundraiser shares.
  */
 export async function getShareCount() {
-  const { data, error } = await supabase
+  const { count, error } = await supabase
     .from("fundraiser_shares")
-    .select("id");
+    .select("id", {
+      count: "exact",
+      head: true,
+    });
 
   if (error) {
     throw new Error(error.message);
   }
 
-  return data?.length ?? 0;
+  return count ?? 0;
 }
 
 /**
- * Record a share from Facebook, text, email, copy link,
- * or the device's native share menu.
+ * Record a fundraiser share.
  */
 export async function recordShare(
   shareMethod
@@ -301,24 +316,23 @@ export async function recordShare(
     );
   }
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from("fundraiser_shares")
     .insert({
       share_method: cleanMethod,
-    })
-    .select()
-    .single();
+    });
 
   if (error) {
     throw new Error(error.message);
   }
 
-  return data;
+  return {
+    success: true,
+  };
 }
 
 /**
- * Load all public fundraiser activity in one request group.
- * Home.jsx can use this when refreshing the page every few seconds.
+ * Load the public fundraiser activity.
  */
 export async function getPublicFundraiserActivity(
   supporterLimit = 6
@@ -349,18 +363,8 @@ export async function getPublicFundraiserActivity(
 }
 
 /**
- * Optional Supabase Realtime subscription.
- *
- * Home.jsx may use this instead of, or together with,
- * a timed refresh.
- *
- * Example:
- *
- * const unsubscribe = subscribeToDonationChanges(() => {
- *   refreshFundraiserData();
- * });
- *
- * return unsubscribe;
+ * Subscribe to donation updates through
+ * Supabase Realtime.
  */
 export function subscribeToDonationChanges(
   handleChange
