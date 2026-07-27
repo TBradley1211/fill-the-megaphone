@@ -1,0 +1,27 @@
+.megaphone-wrapper {
+  width: min(100%, 38rem);
+  margin: 2rem auto 0;
+  text-align: center;
+}
+
+.megaphone-image {
+  display: block;
+  width: min(100%, 32rem);
+  height: auto;
+  margin: 0 auto;
+  object-fit: contain;
+  filter: drop-shadow(
+    0 1.25rem 1.75rem rgba(0, 0, 0, 0.22)
+  );
+}
+
+@media (max-width: 640px) {
+  .megaphone-wrapper {
+    width: 100%;
+    margin-top: 1.5rem;
+  }
+
+  .megaphone-image {
+    width: min(100%, 25rem);
+  }
+}
