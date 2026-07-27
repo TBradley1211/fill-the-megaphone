@@ -2444,3 +2444,1392 @@ p {
     grid-template-columns: 1fr;
   }
 }
+
+/* =========================================
+   FUNDRAISER SHARING
+========================================= */
+
+.fundraiser-share-card {
+  width: min(100%, 42rem);
+  margin: 1.25rem auto 0;
+  padding: 1.15rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 1.15rem;
+  background: rgba(5, 25, 58, 0.3);
+  box-shadow: 0 0.85rem 2.2rem rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(8px);
+}
+
+.fundraiser-share-title {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.05rem;
+  font-weight: 950;
+}
+
+.fundraiser-share-copy {
+  margin: 0.35rem 0 0;
+  color: #dbeafe;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.fundraiser-share-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+
+.share-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 2.9rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 0.75rem;
+  background: #ffffff;
+  color: var(--gators-blue-dark);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 900;
+  box-shadow: 0 0.45rem 1rem rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.share-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.75rem 1.35rem rgba(0, 0, 0, 0.15);
+}
+
+.share-button:focus-visible {
+  outline: 3px solid rgba(255, 183, 94, 0.85);
+  outline-offset: 3px;
+}
+
+.share-facebook {
+  background: #1877f2;
+  color: #ffffff;
+}
+
+.share-text {
+  background: #eaf2ff;
+  color: var(--gators-blue-dark);
+}
+
+.share-email {
+  background: #fff3e5;
+  color: #8a4300;
+}
+
+.share-copy {
+  background: #ffffff;
+  color: #334155;
+}
+
+.share-status {
+  min-height: 1.2rem;
+  margin: 0.7rem 0 0;
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 900;
+  text-align: center;
+}
+
+/* =========================================
+   SPONSOR BADGE PREVIEW + SUCCESS
+========================================= */
+
+.selected-sponsor-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin: -0.35rem 0 1.2rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid #f5d8b5;
+  border-radius: 0.9rem;
+  background: #fffaf4;
+}
+
+.selected-sponsor-badge.blue {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+}
+
+.selected-sponsor-badge.champion {
+  border-color: #fde68a;
+  background: #fffbeb;
+}
+
+.selected-sponsor-badge.mvp {
+  border-color: #ddd6fe;
+  background: #f5f3ff;
+}
+
+.selected-sponsor-badge-icon,
+.donation-success-badge {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 2.9rem;
+  height: 2.9rem;
+  border-radius: 50%;
+  background: var(--gators-orange);
+  color: #ffffff;
+  font-size: 1.25rem;
+  box-shadow: 0 0.5rem 1rem rgba(242, 140, 40, 0.22);
+}
+
+.selected-sponsor-badge.blue .selected-sponsor-badge-icon,
+.donation-success-badge.blue {
+  background: var(--gators-blue);
+}
+
+.selected-sponsor-badge.champion .selected-sponsor-badge-icon,
+.donation-success-badge.champion {
+  background: #d18b00;
+}
+
+.selected-sponsor-badge.mvp .selected-sponsor-badge-icon,
+.donation-success-badge.mvp {
+  background: #6f42c1;
+}
+
+.selected-sponsor-badge div {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.selected-sponsor-badge div > span {
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.selected-sponsor-badge strong {
+  color: var(--ink);
+  font-size: 1rem;
+}
+
+.donation-success-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 1px solid #86efac;
+  border-radius: 0.9rem;
+  background: #f0fdf4;
+  color: #166534;
+  animation: sponsorBadgePop 0.45s cubic-bezier(0.2, 0.9, 0.25, 1.25) both;
+}
+
+.donation-success-card > div {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.donation-success-card strong {
+  font-size: 1.05rem;
+}
+
+.donation-success-card p,
+.donation-success-card span {
+  margin: 0;
+  line-height: 1.45;
+}
+
+.donation-success-card span {
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+@keyframes sponsorBadgePop {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@media (max-width: 640px) {
+  .fundraiser-share-buttons {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .share-button {
+    min-height: 3.1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .homepage-progress-fill,
+  .public-wishlist-progress-fill,
+  .dashboard-goal-progress-fill,
+  .wishlist-progress-fill,
+  .donation-success-card {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* =========================================
+   SPONSORSHIP DEDICATION
+========================================= */
+
+.dedication-fieldset {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  padding: 1.2rem;
+  border: 1px solid #dbe4ee;
+  border-radius: 1rem;
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(242, 140, 40, 0.1),
+      transparent 34%
+    ),
+    linear-gradient(145deg, #ffffff 0%, #f7faff 100%);
+  box-shadow: 0 0.45rem 1.2rem rgba(15, 23, 42, 0.055);
+}
+
+.dedication-fieldset legend {
+  max-width: calc(100% - 1rem);
+  padding: 0 0.65rem;
+  color: var(--gators-blue-dark);
+  font-size: 1rem;
+  font-weight: 950;
+  line-height: 1.25;
+}
+
+.dedication-fieldset > p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.55;
+}
+
+.dedication-fieldset label {
+  display: grid;
+  gap: 0.45rem;
+  color: #334155;
+  font-weight: 800;
+  text-align: left;
+}
+
+.dedication-fieldset select,
+.dedication-fieldset input {
+  width: 100%;
+  min-height: 3.2rem;
+  padding: 0.85rem 2.75rem 0.85rem 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.8rem;
+  background-color: #fbfdff;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 600;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.dedication-fieldset select {
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--gators-blue-dark) 50%),
+    linear-gradient(135deg, var(--gators-blue-dark) 50%, transparent 50%);
+  background-position:
+    calc(100% - 1.15rem) calc(50% - 0.15rem),
+    calc(100% - 0.85rem) calc(50% - 0.15rem);
+  background-size: 0.35rem 0.35rem, 0.35rem 0.35rem;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+
+.dedication-fieldset select:hover,
+.dedication-fieldset input:hover {
+  border-color: #9fb7d5;
+  background-color: #ffffff;
+}
+
+.dedication-fieldset select:focus,
+.dedication-fieldset input:focus {
+  border-color: var(--gators-blue);
+  background-color: #ffffff;
+  box-shadow: 0 0 0 0.22rem rgba(11, 79, 179, 0.13);
+}
+
+.dedication-fieldset input::placeholder {
+  color: #94a3b8;
+}
+
+.sponsor-dedication {
+  margin: 0.9rem 0 0;
+  padding: 0.75rem 0.85rem;
+  border-left: 4px solid var(--gators-orange);
+  border-radius: 0.6rem;
+  background: #fff8ef;
+  color: #7c3f00;
+  font-size: 0.88rem;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .dedication-fieldset {
+    padding: 1rem;
+  }
+
+  .dedication-fieldset legend {
+    font-size: 0.95rem;
+  }
+}
+
+
+/* =========================================
+   PUBLIC FUNDRAISER EXPERIENCE
+========================================= */
+
+.megaphone-callout-wrap {
+  position: relative;
+  width: min(100%, 36rem);
+  margin: 1.5rem auto 0;
+}
+
+.megaphone-speech-bubble {
+  position: absolute;
+  top: 0.4rem;
+  right: -1.5rem;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  max-width: 14rem;
+  padding: 0.75rem 0.9rem;
+  border: 2px solid rgba(255, 255, 255, 0.78);
+  border-radius: 1rem 1rem 1rem 0.25rem;
+  background: #ffffff;
+  color: var(--gators-blue-dark);
+  font-size: 0.82rem;
+  font-weight: 950;
+  line-height: 1.35;
+  text-align: left;
+  box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.18);
+  animation: calloutFloat 4s ease-in-out infinite;
+}
+
+.megaphone-speech-bubble::after {
+  content: "";
+  position: absolute;
+  left: 1rem;
+  bottom: -0.55rem;
+  width: 0.9rem;
+  height: 0.9rem;
+  border-right: 2px solid rgba(255, 255, 255, 0.78);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.78);
+  background: #ffffff;
+  transform: rotate(45deg);
+}
+
+.hero-progress-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+
+.hero-progress-stats div {
+  padding: 0.8rem 0.55rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 0.85rem;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.hero-progress-stats span,
+.hero-progress-stats strong {
+  display: block;
+}
+
+.hero-progress-stats span {
+  color: #bfdbfe;
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.hero-progress-stats strong {
+  margin-top: 0.35rem;
+  color: #ffffff;
+  font-size: clamp(1rem, 2.5vw, 1.45rem);
+}
+
+.hero-progress-percent {
+  margin-top: 0.45rem !important;
+  color: #ffffff !important;
+  font-size: 0.86rem;
+  font-weight: 950 !important;
+}
+
+.next-milestone-message {
+  margin-top: 0.85rem !important;
+  padding: 0.65rem 0.8rem;
+  border-radius: 0.7rem;
+  background: rgba(242, 140, 40, 0.16);
+  color: #fff4e7 !important;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.next-milestone-message.goal-complete {
+  background: rgba(34, 197, 94, 0.18);
+  color: #dcfce7 !important;
+}
+
+.live-donation-celebration {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: min(calc(100% - 2rem), 38rem);
+  padding: 1rem 3.2rem 1rem 1rem;
+  border: 2px solid #fdba74;
+  border-radius: 1.1rem;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(242, 140, 40, 0.2), transparent 35%),
+    #ffffff;
+  color: var(--ink);
+  box-shadow: 0 1.25rem 3rem rgba(15, 23, 42, 0.24);
+  transform: translateX(-50%);
+  animation: celebrationSlide 0.45s cubic-bezier(0.2, 0.9, 0.25, 1.2) both;
+}
+
+.celebration-close-button {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.6rem;
+  border: 0;
+  background: transparent;
+  color: #64748b;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.celebration-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gators-orange), #ffb75e);
+  color: #ffffff;
+  font-size: 1.45rem;
+  box-shadow: 0 0.6rem 1.2rem rgba(242, 140, 40, 0.28);
+}
+
+.celebration-copy {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.celebration-eyebrow {
+  color: var(--gators-orange-dark);
+  font-size: 0.7rem;
+  font-weight: 950;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.celebration-copy strong {
+  color: var(--gators-blue-dark);
+  font-size: 1.2rem;
+}
+
+.celebration-copy p {
+  margin: 0;
+  color: #475569;
+  line-height: 1.45;
+}
+
+.celebration-dedication {
+  margin-top: 0.25rem;
+  color: var(--gators-blue);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.milestone-celebration-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(3, 16, 38, 0.76);
+  backdrop-filter: blur(6px);
+}
+
+.milestone-celebration-card {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  justify-items: center;
+  width: min(100%, 30rem);
+  padding: 2.4rem 1.5rem;
+  border: 3px solid #fdba74;
+  border-radius: 1.5rem;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(242, 140, 40, 0.24), transparent 42%),
+    #ffffff;
+  text-align: center;
+  box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.35);
+  animation: milestonePop 0.45s cubic-bezier(0.2, 0.9, 0.25, 1.25) both;
+}
+
+.milestone-trophy {
+  font-size: 3.2rem;
+}
+
+.milestone-celebration-card > p {
+  margin: 0.65rem 0 0.3rem;
+  color: var(--gators-orange-dark);
+  font-size: 0.75rem;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.milestone-celebration-card > strong {
+  color: var(--gators-blue-dark);
+  font-size: clamp(1.8rem, 6vw, 2.8rem);
+  line-height: 1.05;
+}
+
+.milestone-celebration-copy {
+  max-width: 24rem;
+  margin-top: 0.8rem;
+  color: #475569;
+  line-height: 1.55;
+}
+
+.milestone-celebration-card button {
+  margin-top: 1.25rem;
+  padding: 0.85rem 1.1rem;
+  border: 0;
+  border-radius: 0.75rem;
+  background: var(--gators-blue);
+  color: #ffffff;
+  font: inherit;
+  font-weight: 950;
+}
+
+.milestone-confetti {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.milestone-confetti span {
+  position: absolute;
+  top: -10%;
+  left: calc((var(--confetti-index) * 4.1%) + 1%);
+  width: 0.65rem;
+  height: 1.1rem;
+  border-radius: 0.15rem;
+  background: var(--gators-orange);
+  animation: confettiFall 3s linear infinite;
+  animation-delay: calc(var(--confetti-index) * -0.12s);
+}
+
+.milestone-confetti span:nth-child(even) {
+  background: #3b82f6;
+}
+
+.milestone-confetti span:nth-child(3n) {
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+.champions-section,
+.activity-section {
+  padding: 4.5rem 1.25rem;
+}
+
+.champions-section {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(242, 140, 40, 0.18), transparent 35%),
+    linear-gradient(180deg, #fff9f1 0%, #ffffff 100%);
+}
+
+.activity-section {
+  background: #f4f7fb;
+}
+
+.champions-section > .section-heading,
+.activity-section > .section-heading {
+  width: min(100%, 48rem);
+  margin: 0 auto 2rem;
+}
+
+.champions-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  width: min(100%, 76rem);
+  margin: 0 auto;
+}
+
+.champion-plaque {
+  display: grid;
+  justify-items: center;
+  gap: 0.45rem;
+  padding: 1.35rem 1rem;
+  border: 1px solid #f0c46a;
+  border-radius: 1rem;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,0.95), rgba(255,248,224,0.95));
+  text-align: center;
+  box-shadow: 0 0.7rem 1.7rem rgba(138, 91, 0, 0.12);
+}
+
+.champion-trophy {
+  font-size: 2rem;
+}
+
+.champion-plaque strong {
+  color: var(--gators-blue-dark);
+  font-size: 1.05rem;
+}
+
+.champion-plaque span:last-child {
+  color: #8a5b00;
+  font-size: 0.8rem;
+  font-weight: 900;
+}
+
+.activity-feed {
+  display: grid;
+  gap: 0.75rem;
+  width: min(100%, 48rem);
+  margin: 0 auto;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.95rem;
+  background: #ffffff;
+  box-shadow: 0 0.4rem 1rem rgba(15, 23, 42, 0.055);
+  animation: supporterFadeIn 0.45s ease both;
+}
+
+.activity-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 2.8rem;
+  height: 2.8rem;
+  border-radius: 50%;
+  background: #fff0dc;
+  font-size: 1.15rem;
+}
+
+.activity-icon.blue {
+  background: #eaf2ff;
+}
+
+.activity-icon.champion {
+  background: #fffbeb;
+}
+
+.activity-icon.mvp {
+  background: #f5f3ff;
+}
+
+.activity-item strong {
+  color: var(--gators-blue-dark);
+}
+
+.activity-item p {
+  margin: 0.2rem 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.sponsor-wall-card {
+  border-top: 0.35rem solid var(--gators-orange);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sponsor-wall-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.sponsor-wall-card.blue {
+  border-top-color: var(--gators-blue);
+}
+
+.sponsor-wall-card.champion {
+  border-top-color: #d18b00;
+}
+
+.sponsor-wall-card.mvp {
+  border-top-color: #6f42c1;
+}
+
+.sponsor-card-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.sponsor-card-medal {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: #fff0dc;
+  font-size: 1.1rem;
+}
+
+.sponsor-wall-card.blue .sponsor-card-medal {
+  background: #eaf2ff;
+}
+
+.sponsor-wall-card.champion .sponsor-card-medal {
+  background: #fffbeb;
+}
+
+.sponsor-wall-card.mvp .sponsor-card-medal {
+  background: #f5f3ff;
+}
+
+.sponsor-dedication-plaque {
+  display: grid;
+  gap: 0.25rem;
+  margin-top: 1rem;
+  padding: 0.9rem;
+  border: 1px solid #f5d8b5;
+  border-radius: 0.75rem;
+  background: #fffaf4;
+  text-align: center;
+}
+
+.sponsor-dedication-plaque span {
+  color: var(--gators-orange-dark);
+  font-size: 0.7rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sponsor-dedication-plaque strong {
+  color: var(--gators-blue-dark);
+  font-size: 1.05rem;
+}
+
+@keyframes calloutFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-0.4rem); }
+}
+
+@keyframes celebrationSlide {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -1.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes milestonePop {
+  from {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes confettiFall {
+  from {
+    transform: translateY(-10vh) rotate(0deg);
+  }
+  to {
+    transform: translateY(115vh) rotate(720deg);
+  }
+}
+
+@media (max-width: 980px) {
+  .champions-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .megaphone-speech-bubble {
+    right: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-progress-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .megaphone-speech-bubble {
+    position: relative;
+    top: auto;
+    right: auto;
+    width: fit-content;
+    max-width: 100%;
+    margin: 0.4rem auto 1rem;
+  }
+
+  .champions-section,
+  .activity-section {
+    padding: 3.5rem 1rem;
+  }
+
+  .champions-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .live-donation-celebration {
+    align-items: flex-start;
+  }
+
+  .celebration-icon {
+    width: 2.7rem;
+    height: 2.7rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .megaphone-speech-bubble,
+  .live-donation-celebration,
+  .milestone-celebration-card,
+  .milestone-confetti span,
+  .activity-item {
+    animation: none;
+  }
+}
+
+
+/* =========================================
+   PREMIUM SPONSOR WALL + MEGAPHONE ENERGY
+========================================= */
+
+.megaphone-stage {
+  position: relative;
+  width: fit-content;
+  margin: 0 auto;
+  isolation: isolate;
+}
+
+.megaphone-stage .megaphone-wrapper {
+  position: relative;
+  z-index: 2;
+  transition: transform 0.35s ease, filter 0.35s ease;
+}
+
+.megaphone-sound-waves {
+  position: absolute;
+  top: 42%;
+  right: -4.9rem;
+  z-index: 1;
+  width: 6rem;
+  height: 6rem;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.sound-wave {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  border: 0.35rem solid var(--gators-orange);
+  border-left: 0;
+  border-top-color: transparent;
+  border-bottom-color: transparent;
+  border-radius: 0 999px 999px 0;
+  opacity: 0;
+  transform: translateY(-50%) scaleX(0.7);
+  transform-origin: left center;
+  filter: drop-shadow(0 0.25rem 0.35rem rgba(242, 140, 40, 0.25));
+}
+
+.sound-wave-one {
+  width: 1.8rem;
+  height: 2.3rem;
+}
+
+.sound-wave-two {
+  width: 3.2rem;
+  height: 4rem;
+}
+
+.sound-wave-three {
+  width: 4.8rem;
+  height: 5.8rem;
+}
+
+.megaphone-starting .sound-wave-one {
+  opacity: 0.8;
+}
+
+.megaphone-warming-up .sound-wave-one,
+.megaphone-warming-up .sound-wave-two,
+.megaphone-building .sound-wave-one,
+.megaphone-building .sound-wave-two,
+.megaphone-high-energy .sound-wave,
+.megaphone-goal-reached .sound-wave {
+  opacity: 0.95;
+}
+
+.megaphone-building .sound-wave-three {
+  opacity: 0.55;
+}
+
+.megaphone-high-energy .sound-wave,
+.megaphone-goal-reached .sound-wave {
+  animation: megaphoneWavePulse 1.25s ease-in-out infinite;
+}
+
+.megaphone-high-energy .sound-wave-two,
+.megaphone-goal-reached .sound-wave-two {
+  animation-delay: 0.14s;
+}
+
+.megaphone-high-energy .sound-wave-three,
+.megaphone-goal-reached .sound-wave-three {
+  animation-delay: 0.28s;
+}
+
+.megaphone-goal-reached .sound-wave:nth-child(even) {
+  border-right-color: #3b82f6;
+}
+
+.megaphone-goal-reached .megaphone-wrapper {
+  animation: megaphoneVictory 1.1s ease-in-out infinite;
+  filter: drop-shadow(0 0.85rem 1.25rem rgba(242, 140, 40, 0.28));
+}
+
+.megaphone-sparkles span {
+  position: absolute;
+  z-index: 4;
+  color: #ffd166;
+  font-size: 1.25rem;
+  animation: sparklePop 1.2s ease-in-out infinite;
+}
+
+.megaphone-sparkles span:nth-child(1) {
+  top: 3%;
+  left: 8%;
+}
+
+.megaphone-sparkles span:nth-child(2) {
+  top: 10%;
+  right: 0;
+  animation-delay: 0.25s;
+}
+
+.megaphone-sparkles span:nth-child(3) {
+  bottom: 22%;
+  left: -2%;
+  animation-delay: 0.5s;
+}
+
+.sponsor-wall-grid {
+  perspective: 1100px;
+}
+
+.sponsor-wall-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 100%;
+  padding-top: 3.25rem;
+  border: 1px solid rgba(175, 116, 36, 0.25);
+  border-top: 0;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(255, 246, 232, 0.96)),
+    #ffffff;
+  box-shadow:
+    0 1rem 2.1rem rgba(15, 23, 42, 0.11),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  animation: premiumSponsorReveal 0.58s ease both;
+  animation-delay: calc(var(--sponsor-index) * 85ms);
+}
+
+.sponsor-wall-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  border: 2px solid rgba(242, 140, 40, 0.35);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.sponsor-wall-card::after {
+  content: "";
+  position: absolute;
+  inset: 0.48rem;
+  z-index: -1;
+  border: 1px solid rgba(242, 140, 40, 0.16);
+  border-radius: calc(1rem - 0.2rem);
+  pointer-events: none;
+}
+
+.sponsor-wall-card.blue {
+  background: linear-gradient(145deg, #ffffff, #edf5ff);
+}
+
+.sponsor-wall-card.blue::before,
+.sponsor-wall-card.blue::after {
+  border-color: rgba(35, 105, 190, 0.25);
+}
+
+.sponsor-wall-card.champion {
+  background:
+    radial-gradient(circle at 80% 0%, rgba(255, 215, 94, 0.25), transparent 34%),
+    linear-gradient(145deg, #ffffff, #fff8dc);
+}
+
+.sponsor-wall-card.champion::before {
+  border-color: rgba(209, 139, 0, 0.45);
+}
+
+.sponsor-wall-card.mvp {
+  background:
+    radial-gradient(circle at 80% 0%, rgba(111, 66, 193, 0.2), transparent 34%),
+    linear-gradient(145deg, #ffffff, #f4efff);
+}
+
+.sponsor-wall-card.mvp::before {
+  border-color: rgba(111, 66, 193, 0.42);
+}
+
+.sponsor-card-shine {
+  position: absolute;
+  top: -5rem;
+  left: -7rem;
+  z-index: -1;
+  width: 7rem;
+  height: 18rem;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.75), transparent);
+  transform: rotate(25deg);
+  transition: transform 0.75s ease;
+  pointer-events: none;
+}
+
+.sponsor-wall-card:hover .sponsor-card-shine {
+  transform: translateX(30rem) rotate(25deg);
+}
+
+.sponsor-wall-card:hover {
+  transform: translateY(-7px) rotateX(1.5deg);
+  box-shadow:
+    0 1.4rem 2.8rem rgba(15, 23, 42, 0.16),
+    0 0 0.9rem rgba(242, 140, 40, 0.13);
+}
+
+.verified-sponsor-ribbon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  width: 100%;
+  padding: 0.58rem 0.9rem;
+  background: linear-gradient(90deg, var(--gators-blue-dark), var(--gators-blue));
+  color: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 950;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.verified-sponsor-ribbon span {
+  display: grid;
+  place-items: center;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%;
+  background: var(--gators-orange);
+  font-size: 0.72rem;
+}
+
+.sponsor-card-heading {
+  position: relative;
+  z-index: 2;
+}
+
+.sponsor-level-badge {
+  padding: 0.42rem 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+  text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+}
+
+.sponsor-wall-card h3 {
+  margin-top: 1.1rem;
+  letter-spacing: -0.02em;
+}
+
+.sponsor-wall-amount {
+  font-size: 1.35rem;
+  font-weight: 950;
+}
+
+.sponsor-dedication-plaque {
+  position: relative;
+  border: 1px solid rgba(175, 116, 36, 0.28);
+  background:
+    linear-gradient(145deg, rgba(255,255,255,0.96), rgba(255,248,235,0.96));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.9),
+    0 0.4rem 0.8rem rgba(138, 91, 0, 0.06);
+}
+
+.sponsor-dedication-plaque::before,
+.sponsor-dedication-plaque::after {
+  content: "✦";
+  position: absolute;
+  top: 50%;
+  color: rgba(242, 140, 40, 0.5);
+  font-size: 0.6rem;
+  transform: translateY(-50%);
+}
+
+.sponsor-dedication-plaque::before {
+  left: 0.55rem;
+}
+
+.sponsor-dedication-plaque::after {
+  right: 0.55rem;
+}
+
+@keyframes megaphoneWavePulse {
+  0%, 100% {
+    opacity: 0.48;
+    transform: translateY(-50%) scaleX(0.78);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-50%) scaleX(1.08);
+  }
+}
+
+@keyframes megaphoneVictory {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(-1.3deg) scale(1.02); }
+  75% { transform: rotate(1.3deg) scale(1.02); }
+}
+
+@keyframes sparklePop {
+  0%, 100% { opacity: 0.35; transform: scale(0.75) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.2) rotate(25deg); }
+}
+
+@keyframes premiumSponsorReveal {
+  from {
+    opacity: 0;
+    transform: translateY(1.2rem) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Mobile-first refinement pass */
+@media (max-width: 760px) {
+  .hero-section {
+    padding-left: 0.9rem;
+    padding-right: 0.9rem;
+  }
+
+  .hero-content {
+    width: 100%;
+  }
+
+  .organization-name,
+  .team-name {
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+  }
+
+  .overall-progress {
+    padding: 1rem;
+    border-radius: 1rem;
+  }
+
+  .hero-progress-stats {
+    gap: 0.55rem;
+  }
+
+  .hero-progress-stats div {
+    min-height: 4.65rem;
+    padding: 0.72rem 0.5rem;
+  }
+
+  .megaphone-stage {
+    transform: scale(0.92);
+    transform-origin: center center;
+  }
+
+  .megaphone-sound-waves {
+    right: -3.7rem;
+    transform: translateY(-50%) scale(0.78);
+    transform-origin: left center;
+  }
+
+  .megaphone-speech-bubble {
+    min-height: 2.8rem;
+    padding: 0.7rem 0.8rem;
+    font-size: 0.78rem;
+  }
+
+  .donation-form-card,
+  .wishlist-card,
+  .sponsor-wall-card {
+    border-radius: 1rem;
+  }
+
+  button,
+  .primary-button,
+  .secondary-button,
+  .share-button {
+    min-height: 2.85rem;
+  }
+
+  input,
+  select,
+  textarea {
+    min-height: 2.85rem;
+    font-size: 1rem;
+  }
+
+  textarea {
+    min-height: 7rem;
+  }
+
+  .sponsor-wall-grid {
+    gap: 1rem;
+  }
+
+  .sponsor-wall-card {
+    padding: 3.2rem 1rem 1.1rem;
+  }
+
+  .sponsor-card-heading {
+    align-items: flex-start;
+  }
+
+  .sponsor-level-badge {
+    max-width: 70%;
+    text-align: center;
+  }
+
+  .activity-item {
+    align-items: flex-start;
+    padding: 0.9rem;
+  }
+
+  .champion-plaque {
+    padding: 1.1rem 0.9rem;
+  }
+
+  .live-donation-celebration {
+    top: 0.55rem;
+    width: calc(100% - 1rem);
+    padding: 0.85rem 2.7rem 0.85rem 0.8rem;
+    border-radius: 0.9rem;
+  }
+
+  .celebration-copy strong {
+    font-size: 1.02rem;
+  }
+
+  .celebration-copy p {
+    font-size: 0.86rem;
+  }
+}
+
+@media (max-width: 430px) {
+  .hero-section h1 {
+    font-size: clamp(2rem, 11vw, 2.7rem);
+    line-height: 0.98;
+  }
+
+  .hero-progress-stats strong {
+    font-size: 1rem;
+  }
+
+  .hero-progress-stats span {
+    font-size: 0.64rem;
+  }
+
+  .megaphone-stage {
+    transform: scale(0.84);
+    margin-top: -0.5rem;
+    margin-bottom: -0.45rem;
+  }
+
+  .megaphone-sound-waves {
+    right: -3.2rem;
+    transform: translateY(-50%) scale(0.68);
+  }
+
+  .verified-sponsor-ribbon {
+    font-size: 0.62rem;
+  }
+
+  .sponsor-card-medal {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .sponsor-dedication-plaque {
+    padding-left: 1.2rem;
+    padding-right: 1.2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .megaphone-high-energy .sound-wave,
+  .megaphone-goal-reached .sound-wave,
+  .megaphone-goal-reached .megaphone-wrapper,
+  .megaphone-sparkles span,
+  .sponsor-wall-card {
+    animation: none;
+  }
+}

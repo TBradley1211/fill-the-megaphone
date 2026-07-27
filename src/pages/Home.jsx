@@ -3,14 +3,61 @@ import Megaphone from "../components/Megaphone";
 import { getFundraiserSettings } from "../services/fundraiserService";
 import { getCategories } from "../services/categoryService";
 import {
-  getVerifiedDonationTotal,
-  getRecentVerifiedSupporters,
-  getVerifiedSupporterCount,
+  getPublicFundraiserActivity,
+  recordShare,
   submitDonation,
+  subscribeToDonationChanges,
 } from "../services/donationService";
 import { getActiveWishlistItems } from "../services/wishlistService";
 import "../styles/global.css";
 import "../styles/megaphone.css";
+
+function ShareIcon({ type }) {
+  const commonProps = {
+    width: 22,
+    height: 22,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 2,
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    "aria-hidden": true,
+  };
+
+  if (type === "facebook") {
+    return (
+      <svg {...commonProps} viewBox="0 0 24 24">
+        <path d="M14 8h3V4h-3c-3.3 0-5 2-5 5v3H6v4h3v6h4v-6h3.5l.5-4h-4V9c0-.7.3-1 1-1Z" />
+      </svg>
+    );
+  }
+
+  if (type === "text") {
+    return (
+      <svg {...commonProps}>
+        <path d="M21 15a4 4 0 0 1-4 4H8l-5 3 1.6-4.8A7 7 0 0 1 3 13V8a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z" />
+        <path d="M8 10h.01M12 10h.01M16 10h.01" />
+      </svg>
+    );
+  }
+
+  if (type === "email") {
+    return (
+      <svg {...commonProps}>
+        <rect x="3" y="5" width="18" height="14" rx="2" />
+        <path d="m3 7 9 6 9-6" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg {...commonProps}>
+      <rect x="9" y="9" width="11" height="11" rx="2" />
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+    </svg>
+  );
+}
 
 function Home() {
   const [settings, setSettings] = useState(null);
@@ -19,6 +66,18 @@ function Home() {
   const [recentSupporters, setRecentSupporters] = useState([]);
   const [supporterCount, setSupporterCount] = useState(0);
   const [amountCovered, setAmountCovered] = useState(0);
+  const [displayedAmount, setDisplayedAmount] = useState(0);
+  const [animatedProgress, setAnimatedProgress] = useState(0);
+  const [shareMessage, setShareMessage] = useState("");
+  const [shareCount, setShareCount] = useState(0);
+  const [latestSupporterId, setLatestSupporterId] = useState(null);
+  const [celebration, setCelebration] = useState(null);
+  const [milestoneCelebration, setMilestoneCelebration] = useState(null);
+  const [submittedSponsorLevel, setSubmittedSponsorLevel] = useState(null);
+  const [submittedAmount, setSubmittedAmount] = useState(0);
+  const [megaphoneCalloutIndex] = useState(() =>
+    Math.floor(Math.random() * 3)
+  );
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -30,6 +89,8 @@ function Home() {
   const [donorEmail, setDonorEmail] = useState("");
   const [donorMessage, setDonorMessage] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
+  const [dedicationType, setDedicationType] = useState("");
+  const [dedicationName, setDedicationName] = useState("");
 
   const [submittingDonation, setSubmittingDonation] =
     useState(false);
@@ -43,40 +104,268 @@ function Home() {
     useState("all");
 
   useEffect(() => {
+    let isMounted = true;
+
     async function loadData() {
       try {
         const [
           fundraiserSettings,
           fundraiserCategories,
-          verifiedDonationTotal,
           activeWishlistItems,
-          supporters,
-          totalSupporters,
+          fundraiserActivity,
         ] = await Promise.all([
           getFundraiserSettings(),
           getCategories(),
-          getVerifiedDonationTotal(),
           getActiveWishlistItems(),
-          getRecentVerifiedSupporters(),
-          getVerifiedSupporterCount(),
+          getPublicFundraiserActivity(),
         ]);
+
+        if (!isMounted) {
+          return;
+        }
 
         setSettings(fundraiserSettings);
         setCategories(fundraiserCategories);
-        setAmountCovered(verifiedDonationTotal);
         setWishlistItems(activeWishlistItems);
-        setRecentSupporters(supporters);
-        setSupporterCount(totalSupporters);
+        setAmountCovered(fundraiserActivity.amountCovered);
+        setRecentSupporters(fundraiserActivity.recentSupporters);
+        setSupporterCount(fundraiserActivity.supporterCount);
+        setShareCount(fundraiserActivity.shareCount);
+        setLatestSupporterId(
+          fundraiserActivity.latestSupporter?.id ?? null
+        );
       } catch (err) {
         console.error(err);
-        setError(err.message);
+
+        if (isMounted) {
+          setError(err.message);
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     }
 
     loadData();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
+
+  useEffect(() => {
+    if (loading) {
+      return undefined;
+    }
+
+    let isMounted = true;
+    let refreshInProgress = false;
+
+    async function refreshFundraiserActivity({
+      celebrate = true,
+    } = {}) {
+      if (refreshInProgress) {
+        return;
+      }
+
+      refreshInProgress = true;
+
+      try {
+        const activity =
+          await getPublicFundraiserActivity();
+
+        if (!isMounted) {
+          return;
+        }
+
+        const previousAmount = Number(
+          amountCovered || 0
+        );
+        const nextAmount = Number(
+          activity.amountCovered || 0
+        );
+        const newestSupporter =
+          activity.latestSupporter;
+
+        setAmountCovered(nextAmount);
+        setRecentSupporters(
+          activity.recentSupporters
+        );
+        setSupporterCount(
+          activity.supporterCount
+        );
+        setShareCount(activity.shareCount);
+
+        if (
+          celebrate &&
+          newestSupporter?.id &&
+          latestSupporterId &&
+          newestSupporter.id !==
+            latestSupporterId
+        ) {
+          setCelebration({
+            id: newestSupporter.id,
+            name:
+              newestSupporter.display_name ||
+              "A new supporter",
+            amount: Number(
+              newestSupporter.amount || 0
+            ),
+            dedicationType:
+              newestSupporter.dedication_type || "",
+            dedicationName:
+              newestSupporter.dedication_name || "",
+          });
+
+          window.setTimeout(
+            () => setCelebration(null),
+            7000
+          );
+        }
+
+        if (newestSupporter?.id) {
+          setLatestSupporterId(
+            newestSupporter.id
+          );
+        }
+
+        if (
+          celebrate &&
+          settings?.fundraising_goal &&
+          nextAmount > previousAmount
+        ) {
+          const goal = Number(
+            settings.fundraising_goal
+          );
+
+          const previousPercent =
+            goal > 0
+              ? (previousAmount / goal) * 100
+              : 0;
+
+          const nextPercent =
+            goal > 0
+              ? (nextAmount / goal) * 100
+              : 0;
+
+          const crossedMilestone = [
+            100,
+            75,
+            50,
+            25,
+          ].find(
+            (milestone) =>
+              previousPercent < milestone &&
+              nextPercent >= milestone
+          );
+
+          if (crossedMilestone) {
+            setMilestoneCelebration(
+              crossedMilestone
+            );
+
+            window.setTimeout(
+              () =>
+                setMilestoneCelebration(
+                  null
+                ),
+              6500
+            );
+          }
+        }
+      } catch (refreshError) {
+        console.error(
+          "Unable to refresh fundraiser activity:",
+          refreshError
+        );
+      } finally {
+        refreshInProgress = false;
+      }
+    }
+
+    const intervalId = window.setInterval(
+      () => {
+        refreshFundraiserActivity();
+      },
+      10000
+    );
+
+    let unsubscribe = () => {};
+
+    try {
+      unsubscribe =
+        subscribeToDonationChanges(() => {
+          refreshFundraiserActivity();
+        });
+    } catch (subscriptionError) {
+      console.warn(
+        "Realtime updates are unavailable. Timed refresh will continue.",
+        subscriptionError
+      );
+    }
+
+    return () => {
+      isMounted = false;
+      window.clearInterval(intervalId);
+      unsubscribe();
+    };
+  }, [
+    amountCovered,
+    latestSupporterId,
+    loading,
+    settings,
+  ]);
+
+  useEffect(() => {
+    if (loading) {
+      return undefined;
+    }
+
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    const targetAmount = Number(amountCovered || 0);
+    const targetProgress =
+      Number(settings?.fundraising_goal) > 0
+        ? Math.min(
+            Math.round(
+              (targetAmount /
+                Number(settings.fundraising_goal)) *
+                100
+            ),
+            100
+          )
+        : 0;
+
+    if (reduceMotion) {
+      setDisplayedAmount(targetAmount);
+      setAnimatedProgress(targetProgress);
+      return undefined;
+    }
+
+    let animationFrame;
+    const duration = 1200;
+    const startTime = performance.now();
+
+    function animate(currentTime) {
+      const elapsed = currentTime - startTime;
+      const rawProgress = Math.min(elapsed / duration, 1);
+      const easedProgress = 1 - Math.pow(1 - rawProgress, 3);
+
+      setDisplayedAmount(targetAmount * easedProgress);
+      setAnimatedProgress(targetProgress * easedProgress);
+
+      if (rawProgress < 1) {
+        animationFrame = requestAnimationFrame(animate);
+      }
+    }
+
+    animationFrame = requestAnimationFrame(animate);
+
+    return () => cancelAnimationFrame(animationFrame);
+  }, [amountCovered, loading, settings]);
 
   if (loading) {
     return (
@@ -115,6 +404,64 @@ function Home() {
           100
         )
       : 0;
+
+  const milestoneTargets = [
+    25,
+    50,
+    75,
+    100,
+  ];
+
+  const nextMilestone =
+    milestoneTargets.find(
+      (milestone) => progress < milestone
+    ) ?? 100;
+
+  const nextMilestoneAmount =
+    totalGoal > 0
+      ? Math.max(
+          Math.ceil(
+            (nextMilestone / 100) *
+              totalGoal -
+              amountCovered
+          ),
+          0
+        )
+      : 0;
+
+  const remainingToGoal = Math.max(
+    totalGoal - amountCovered,
+    0
+  );
+
+  const championSupporters = recentSupporters.filter(
+    (supporter) => Number(supporter.amount || 0) >= 100
+  );
+
+  const megaphoneCallouts = [
+    "Help us cheer all season long!",
+    "Every dollar gets us closer!",
+    "Thanks for supporting Gators Cheer!",
+  ];
+
+  const milestoneMessages = {
+    25: {
+      title: "First Quarter Complete!",
+      copy: "The Gators have officially reached 25% of our goal!",
+    },
+    50: {
+      title: "Halfway There!",
+      copy: "Thank you, Gators family. We are halfway to the finish line!",
+    },
+    75: {
+      title: "One Final Push!",
+      copy: "We are almost there. Keep cheering us toward the goal!",
+    },
+    100: {
+      title: "We Did It!",
+      copy: "Thank you for helping the Gators reach the full fundraising goal!",
+    },
+  };
 
   const donationAmount =
     customAmount !== ""
@@ -264,11 +611,95 @@ function Home() {
       });
   }
 
+  function getShareDetails() {
+    const shareUrl = window.location.href;
+    const shareText = `Help ${settings.team_name} fill the megaphone for the ${settings.season} season! Every sponsorship helps our athletes get the supplies they need.`;
+
+    return { shareUrl, shareText };
+  }
+
+  async function recordFundraiserShare(
+    method
+  ) {
+    try {
+      await recordShare(method);
+      setShareCount(
+        (currentCount) =>
+          currentCount + 1
+      );
+    } catch (shareError) {
+      console.warn(
+        "Unable to record fundraiser share:",
+        shareError
+      );
+    }
+  }
+
+  function handleFacebookShare() {
+    const { shareUrl } = getShareDetails();
+    recordFundraiserShare("facebook");
+    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+      shareUrl
+    )}`;
+
+    window.open(
+      facebookUrl,
+      "facebook-share",
+      "width=720,height=620,noopener,noreferrer"
+    );
+  }
+
+  function handleTextShare() {
+    const { shareUrl, shareText } = getShareDetails();
+    recordFundraiserShare("text");
+    const body = encodeURIComponent(`${shareText} ${shareUrl}`);
+    const isAppleDevice = /iPad|iPhone|iPod/.test(
+      navigator.userAgent
+    );
+    const smsUrl = isAppleDevice
+      ? `sms:&body=${body}`
+      : `sms:?body=${body}`;
+
+    window.location.href = smsUrl;
+  }
+
+  function handleEmailShare() {
+    const { shareUrl, shareText } = getShareDetails();
+    recordFundraiserShare("email");
+    const subject = encodeURIComponent(
+      `Support ${settings.team_name}`
+    );
+    const body = encodeURIComponent(
+      `${shareText}
+
+${shareUrl}`
+    );
+
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  }
+
+  async function handleCopyShareLink() {
+    const { shareUrl } = getShareDetails();
+
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      await recordFundraiserShare("copy");
+      setShareMessage("Fundraiser link copied!");
+    } catch (clipboardError) {
+      console.warn("Unable to copy fundraiser link:", clipboardError);
+      setShareMessage("Copy the link from your browser address bar.");
+    }
+
+    window.setTimeout(() => setShareMessage(""), 3000);
+  }
+
   async function handleDonationSubmit(event) {
     event.preventDefault();
 
     setDonationError("");
     setDonationSuccess("");
+    setSubmittedSponsorLevel(null);
+    setSubmittedAmount(0);
 
     if (!donorName.trim()) {
       setDonationError("Please enter your name.");
@@ -299,8 +730,14 @@ function Home() {
         donorMessage,
         amount: donationAmount,
         isAnonymous,
+        dedicationType,
+        dedicationName,
       });
 
+      const sponsorLevel = getSponsorLevel(donationAmount);
+
+      setSubmittedSponsorLevel(sponsorLevel);
+      setSubmittedAmount(donationAmount);
       setDonationSuccess(
         "Your sponsorship was recorded as pending. Complete your payment in Cash App."
       );
@@ -318,6 +755,8 @@ function Home() {
       setDonorEmail("");
       setDonorMessage("");
       setIsAnonymous(false);
+      setDedicationType("");
+      setDedicationName("");
       setSelectedAmount(25);
       setCustomAmount("");
     } catch (err) {
@@ -360,6 +799,98 @@ function Home() {
 
   return (
     <main>
+      {celebration && (
+        <div
+          className="live-donation-celebration"
+          role="status"
+          aria-live="polite"
+        >
+          <button
+            type="button"
+            className="celebration-close-button"
+            onClick={() => setCelebration(null)}
+            aria-label="Close celebration"
+          >
+            ×
+          </button>
+
+          <span
+            className="celebration-icon"
+            aria-hidden="true"
+          >
+            ★
+          </span>
+
+          <div className="celebration-copy">
+            <span className="celebration-eyebrow">
+              New Gator Sponsor
+            </span>
+            <strong>{celebration.name}</strong>
+            <p>
+              Just became a{" "}
+              {getSponsorLevel(celebration.amount).name} with a $
+              {celebration.amount.toLocaleString(
+                "en-US",
+                {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 2,
+                }
+              )} sponsorship!
+            </p>
+
+            {celebration.dedicationName && (
+              <span className="celebration-dedication">
+                Dedicated to {celebration.dedicationName}
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
+      {milestoneCelebration && (
+        <div
+          className="milestone-celebration-overlay"
+          role="status"
+          aria-live="assertive"
+        >
+          <div className="milestone-confetti" aria-hidden="true">
+            {Array.from({ length: 24 }).map(
+              (_, index) => (
+                <span
+                  key={index}
+                  style={{
+                    "--confetti-index": index,
+                  }}
+                />
+              )
+            )}
+          </div>
+
+          <div className="milestone-celebration-card">
+            <span className="milestone-trophy" aria-hidden="true">
+              {milestoneCelebration === 100 ? "📣" : "🏆"}
+            </span>
+            <p>{milestoneCelebration}% Milestone</p>
+            <strong>
+              {milestoneMessages[milestoneCelebration]?.title}
+            </strong>
+            <span className="milestone-celebration-copy">
+              {milestoneMessages[milestoneCelebration]?.copy}
+            </span>
+            <button
+              type="button"
+              onClick={() =>
+                setMilestoneCelebration(null)
+              }
+            >
+              {milestoneCelebration === 100
+                ? "Go Gators!"
+                : "Keep Cheering Us On"}
+            </button>
+          </div>
+        </div>
+      )}
+
       <section className="hero-section">
         <div className="hero-content">
           <p className="organization-name">
@@ -372,21 +903,75 @@ function Home() {
             {settings.team_name}
           </p>
 
-          <Megaphone progress={progress} />
+          <div
+            className={`megaphone-callout-wrap ${
+              progress >= 100
+                ? "megaphone-goal-reached"
+                : progress >= 75
+                ? "megaphone-high-energy"
+                : progress >= 50
+                ? "megaphone-building"
+                : progress >= 25
+                ? "megaphone-warming-up"
+                : "megaphone-starting"
+            }`}
+          >
+            <div className="megaphone-stage">
+              <Megaphone progress={animatedProgress} />
+              <div className="megaphone-sound-waves" aria-hidden="true">
+                <span className="sound-wave sound-wave-one" />
+                <span className="sound-wave sound-wave-two" />
+                <span className="sound-wave sound-wave-three" />
+              </div>
+              {progress >= 100 && (
+                <div className="megaphone-sparkles" aria-hidden="true">
+                  <span>✦</span>
+                  <span>✦</span>
+                  <span>✦</span>
+                </div>
+              )}
+            </div>
+            <div className="megaphone-speech-bubble" role="status">
+              <span aria-hidden="true">📣</span>
+              {megaphoneCallouts[megaphoneCalloutIndex]}
+            </div>
+          </div>
 
           <div className="overall-progress">
-            <h2>
-              Help Us Reach Our $
-              {totalGoal.toLocaleString("en-US")} Goal
-            </h2>
+            <h2>Fundraiser Progress</h2>
 
-            <p className="overall-progress-raised">
-              $
-              {amountCovered.toLocaleString(
-                "en-US"
-              )}{" "}
-              Raised
-            </p>
+            <div className="hero-progress-stats">
+              <div>
+                <span>Goal</span>
+                <strong>
+                  ${totalGoal.toLocaleString("en-US")}
+                </strong>
+              </div>
+              <div>
+                <span>Raised</span>
+                <strong>
+                  ${displayedAmount.toLocaleString("en-US", {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0,
+                  })}
+                </strong>
+              </div>
+              <div>
+                <span>Remaining</span>
+                <strong>
+                  ${remainingToGoal.toLocaleString("en-US", {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0,
+                  })}
+                </strong>
+              </div>
+              <div>
+                <span>Supporters</span>
+                <strong>
+                  {supporterCount.toLocaleString("en-US")}
+                </strong>
+              </div>
+            </div>
 
             <div
               className="homepage-progress-track"
@@ -394,11 +979,85 @@ function Home() {
             >
               <div
                 className="homepage-progress-fill"
-                style={{ width: `${progress}%` }}
+                style={{ width: `${animatedProgress}%` }}
               />
             </div>
 
-            <p>{progress}% complete</p>
+            <p className="hero-progress-percent">
+              {Math.round(animatedProgress)}% complete
+            </p>
+
+            {progress < 100 ? (
+              <p className="next-milestone-message">
+                Only ${remainingToGoal.toLocaleString("en-US")} left
+                to reach our full goal. The next celebration is{" "}
+                {nextMilestone}% — just $
+                {nextMilestoneAmount.toLocaleString("en-US")} away!
+              </p>
+            ) : (
+              <p className="next-milestone-message goal-complete">
+                Goal reached — thank you, Gators family!
+              </p>
+            )}
+          </div>
+
+          <div className="fundraiser-share-card">
+            <p className="fundraiser-share-title">
+              Help us spread the word
+            </p>
+            <p className="fundraiser-share-copy">
+              Share this fundraiser with family, friends, and Gators fans.
+            </p>
+
+            <div className="fundraiser-share-buttons">
+              <button
+                type="button"
+                className="share-button share-facebook"
+                onClick={handleFacebookShare}
+              >
+                <ShareIcon type="facebook" />
+                <span>Facebook</span>
+              </button>
+
+              <button
+                type="button"
+                className="share-button share-text"
+                onClick={handleTextShare}
+              >
+                <ShareIcon type="text" />
+                <span>Text</span>
+              </button>
+
+              <button
+                type="button"
+                className="share-button share-email"
+                onClick={handleEmailShare}
+              >
+                <ShareIcon type="email" />
+                <span>Email</span>
+              </button>
+
+              <button
+                type="button"
+                className="share-button share-copy"
+                onClick={handleCopyShareLink}
+              >
+                <ShareIcon type="copy" />
+                <span>Copy Link</span>
+              </button>
+            </div>
+
+            <p className="share-count">
+              {shareCount.toLocaleString("en-US")}{" "}
+              {shareCount === 1
+                ? "person has"
+                : "people have"}{" "}
+              shared this fundraiser
+            </p>
+
+            <p className="share-status" aria-live="polite">
+              {shareMessage}
+            </p>
           </div>
         </div>
       </section>
@@ -526,6 +1185,80 @@ function Home() {
               />
             </label>
 
+            <fieldset className="dedication-fieldset">
+              <legend>Dedicate This Sponsorship</legend>
+
+              <p>
+                Optional: recognize a cheerleader, loved one,
+                family, or local business on the Sponsor Wall.
+              </p>
+
+              <label htmlFor="dedicationType">
+                Dedication type
+                <select
+                  id="dedicationType"
+                  value={dedicationType}
+                  onChange={(event) => {
+                    setDedicationType(
+                      event.target.value
+                    );
+
+                    if (!event.target.value) {
+                      setDedicationName("");
+                    }
+                  }}
+                >
+                  <option value="">
+                    No dedication
+                  </option>
+                  <option value="in_honor_of">
+                    In honor of
+                  </option>
+                  <option value="in_memory_of">
+                    In memory of
+                  </option>
+                  <option value="family">
+                    From our family
+                  </option>
+                  <option value="business">
+                    From a local business
+                  </option>
+                </select>
+              </label>
+
+              {dedicationType && (
+                <label htmlFor="dedicationName">
+                  {dedicationType ===
+                  "in_honor_of"
+                    ? "Who is this in honor of?"
+                    : dedicationType ===
+                      "in_memory_of"
+                    ? "Who is this in memory of?"
+                    : dedicationType ===
+                      "business"
+                    ? "Business name"
+                    : "Family name"}
+
+                  <input
+                    id="dedicationName"
+                    type="text"
+                    value={dedicationName}
+                    onChange={(event) =>
+                      setDedicationName(
+                        event.target.value
+                      )
+                    }
+                    placeholder={
+                      dedicationType ===
+                      "business"
+                        ? "Example: Bradley Auto Care"
+                        : "Enter the name"
+                    }
+                  />
+                </label>
+              )}
+            </fieldset>
+
             <label className="anonymous-option">
               <input
                 type="checkbox"
@@ -640,16 +1373,45 @@ function Home() {
             </strong>
           </p>
 
+          <div
+            className={`selected-sponsor-badge ${
+              getSponsorLevel(donationAmount).className
+            }`}
+          >
+            <span className="selected-sponsor-badge-icon" aria-hidden="true">
+              ★
+            </span>
+            <div>
+              <span>Your sponsorship level</span>
+              <strong>
+                {getSponsorLevel(donationAmount).name}
+              </strong>
+            </div>
+          </div>
+
           {donationError && (
             <p className="form-error">
               {donationError}
             </p>
           )}
 
-          {donationSuccess && (
-            <p className="form-success">
-              {donationSuccess}
-            </p>
+          {donationSuccess && submittedSponsorLevel && (
+            <div className="donation-success-card" role="status">
+              <span
+                className={`donation-success-badge ${submittedSponsorLevel.className}`}
+                aria-hidden="true"
+              >
+                ★
+              </span>
+
+              <div>
+                <strong>{submittedSponsorLevel.name}</strong>
+                <p>{donationSuccess}</p>
+                <span>
+                  ${Number(submittedAmount).toLocaleString("en-US")} sponsorship
+                </span>
+              </div>
+            </div>
           )}
 
           <button
@@ -1047,6 +1809,81 @@ function Home() {
         </div>
       </section>
 
+      {championSupporters.length > 0 && (
+        <section className="champions-section">
+          <div className="section-heading">
+            <p className="eyebrow">Top Recognition</p>
+            <h2>Wall of Champions</h2>
+            <p>
+              Celebrating our Season MVP Sponsors who gave $100
+              or more to support Gators Cheer.
+            </p>
+          </div>
+
+          <div className="champions-grid">
+            {championSupporters.map((supporter) => (
+              <article className="champion-plaque" key={supporter.id}>
+                <span className="champion-trophy" aria-hidden="true">
+                  🏆
+                </span>
+                <strong>{supporter.display_name}</strong>
+                <span>
+                  ${Number(supporter.amount || 0).toLocaleString(
+                    "en-US",
+                    {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 2,
+                    }
+                  )} Season MVP
+                </span>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {recentSupporters.length > 0 && (
+        <section className="activity-section">
+          <div className="section-heading">
+            <p className="eyebrow">Happening Now</p>
+            <h2>Recent Gator Activity</h2>
+          </div>
+
+          <div className="activity-feed">
+            {recentSupporters.slice(0, 6).map((supporter) => {
+              const level = getSponsorLevel(supporter.amount);
+
+              return (
+                <article className="activity-item" key={supporter.id}>
+                  <span
+                    className={`activity-icon ${level.className}`}
+                    aria-hidden="true"
+                  >
+                    {level.className === "mvp"
+                      ? "🏆"
+                      : level.className === "champion"
+                      ? "🥇"
+                      : level.className === "blue"
+                      ? "💙"
+                      : "🧡"}
+                  </span>
+                  <div>
+                    <strong>{supporter.display_name}</strong>
+                    <p>
+                      Became a {level.name}
+                      {supporter.dedication_name
+                        ? ` and dedicated it to ${supporter.dedication_name}`
+                        : ""}
+                      .
+                    </p>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       {recentSupporters.length > 0 && (
         <section className="sponsor-wall-section">
           <div className="section-heading">
@@ -1064,7 +1901,7 @@ function Home() {
           </div>
 
           <div className="sponsor-wall-grid">
-            {recentSupporters.map((supporter) => {
+            {recentSupporters.map((supporter, supporterIndex) => {
               const sponsorLevel = getSponsorLevel(
                 supporter.amount
               );
@@ -1073,10 +1910,35 @@ function Home() {
                 <article
                   key={supporter.id}
                   className={`sponsor-wall-card ${sponsorLevel.className}`}
+                  style={{
+                    "--sponsor-index": supporterIndex,
+                  }}
                 >
-                  <span className="sponsor-level-badge">
-                    {sponsorLevel.name}
-                  </span>
+                  <div className="verified-sponsor-ribbon">
+                    <span aria-hidden="true">✓</span>
+                    Verified Sponsor
+                  </div>
+
+                  <div className="sponsor-card-shine" aria-hidden="true" />
+
+                  <div className="sponsor-card-heading">
+                    <span
+                      className="sponsor-card-medal"
+                      aria-hidden="true"
+                    >
+                      {sponsorLevel.className === "mvp"
+                        ? "🏆"
+                        : sponsorLevel.className === "champion"
+                        ? "🥇"
+                        : sponsorLevel.className === "blue"
+                        ? "💙"
+                        : "🧡"}
+                    </span>
+
+                    <span className="sponsor-level-badge">
+                      {sponsorLevel.name}
+                    </span>
+                  </div>
 
                   <h3>{supporter.display_name}</h3>
 
@@ -1089,6 +1951,27 @@ function Home() {
                       maximumFractionDigits: 2,
                     })}
                   </p>
+
+                  {supporter.dedication_type &&
+                    supporter.dedication_name && (
+                      <div className="sponsor-dedication-plaque">
+                        <span>
+                          {supporter.dedication_type ===
+                          "in_honor_of"
+                            ? "In Honor Of"
+                            : supporter.dedication_type ===
+                              "in_memory_of"
+                            ? "In Memory Of"
+                            : supporter.dedication_type ===
+                              "business"
+                            ? "Proudly Sponsored By"
+                            : "Dedicated With Love"}
+                        </span>
+                        <strong>
+                          {supporter.dedication_name}
+                        </strong>
+                      </div>
+                    )}
 
                   {supporter.donor_message && (
                     <blockquote>
