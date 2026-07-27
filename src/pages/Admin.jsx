@@ -149,6 +149,19 @@ function Admin() {
     [activeWishlistItems]
   );
 
+  const wishlistQuantityRemaining = useMemo(
+    () =>
+      Math.max(
+        wishlistQuantityNeeded -
+          wishlistQuantityPurchased,
+        0
+      ),
+    [
+      wishlistQuantityNeeded,
+      wishlistQuantityPurchased,
+    ]
+  );
+
   async function handleDonationStatusUpdate(
     donation,
     newStatus
@@ -196,7 +209,10 @@ function Admin() {
   }
 
   function handleVerifyDonation(donation) {
-    handleDonationStatusUpdate(donation, "verified");
+    handleDonationStatusUpdate(
+      donation,
+      "verified"
+    );
   }
 
   function handleRejectDonation(donation) {
@@ -212,7 +228,10 @@ function Admin() {
       return;
     }
 
-    handleDonationStatusUpdate(donation, "rejected");
+    handleDonationStatusUpdate(
+      donation,
+      "rejected"
+    );
   }
 
   async function handleWishlistSubmit(formData) {
@@ -222,10 +241,11 @@ function Admin() {
 
     try {
       if (editingWishlistItem) {
-        const updatedItem = await updateWishlistItem(
-          editingWishlistItem.id,
-          formData
-        );
+        const updatedItem =
+          await updateWishlistItem(
+            editingWishlistItem.id,
+            formData
+          );
 
         setWishlistItems((currentItems) =>
           currentItems.map((item) =>
@@ -240,9 +260,8 @@ function Admin() {
           `${updatedItem.item_name} was updated.`
         );
       } else {
-        const newItem = await createWishlistItem(
-          formData
-        );
+        const newItem =
+          await createWishlistItem(formData);
 
         setWishlistItems((currentItems) => [
           newItem,
@@ -311,7 +330,9 @@ function Admin() {
     );
   }
 
-  async function handleToggleWishlistActive(item) {
+  async function handleToggleWishlistActive(
+    item
+  ) {
     setUpdatingWishlistItemId(item.id);
     setDashboardError("");
     setDashboardMessage("");
@@ -332,7 +353,8 @@ function Admin() {
       );
 
       if (
-        editingWishlistItem?.id === updatedItem.id
+        editingWishlistItem?.id ===
+        updatedItem.id
       ) {
         setEditingWishlistItem(updatedItem);
       }
@@ -350,7 +372,9 @@ function Admin() {
     }
   }
 
-  async function handleDeleteWishlistItem(item) {
+  async function handleDeleteWishlistItem(
+    item
+  ) {
     const confirmed = window.confirm(
       `Permanently delete "${item.item_name}"? This cannot be undone.`
     );
@@ -482,6 +506,12 @@ function Admin() {
           }
           pendingCount={pendingDonations.length}
           verifiedCount={verifiedDonations.length}
+          wishlistPurchased={
+            wishlistQuantityPurchased
+          }
+          wishlistRemaining={
+            wishlistQuantityRemaining
+          }
         />
 
         <section className="admin-dashboard-section">
@@ -494,8 +524,9 @@ function Admin() {
               <h2>Pending Donations</h2>
 
               <p>
-                Verify each donation after confirming
-                the payment in Cash App.
+                Verify each donation after
+                confirming the payment in Cash
+                App.
               </p>
             </div>
 
@@ -532,8 +563,9 @@ function Admin() {
 
               <p>
                 {wishlistQuantityPurchased} of{" "}
-                {wishlistQuantityNeeded} active wishlist
-                items have been purchased.
+                {wishlistQuantityNeeded} active
+                wishlist items have been
+                purchased.
               </p>
             </div>
           </div>
@@ -581,21 +613,27 @@ function Admin() {
 
           <div className="admin-history-grid">
             <article>
-              <span>Verified Donations</span>
+              <span>
+                Verified Donations
+              </span>
               <strong>
                 {verifiedDonations.length}
               </strong>
             </article>
 
             <article>
-              <span>Rejected Donations</span>
+              <span>
+                Rejected Donations
+              </span>
               <strong>
                 {rejectedDonations.length}
               </strong>
             </article>
 
             <article>
-              <span>Active Wishlist Items</span>
+              <span>
+                Active Wishlist Items
+              </span>
               <strong>
                 {activeWishlistItems.length}
               </strong>
