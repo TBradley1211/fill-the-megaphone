@@ -10,102 +10,113 @@ function DonationTable({
         <h3>No pending donations</h3>
 
         <p>
-          New Cash App sponsorship submissions will appear here.
+          New Cash App sponsorship submissions will
+          appear here.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="donation-table-wrapper">
-      <table className="donation-table">
-        <thead>
-          <tr>
-            <th>Donor</th>
-            <th>Contact</th>
-            <th>Amount</th>
-            <th>Message</th>
-            <th>Submitted</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
+    <div className="donation-review-grid">
+      {donations.map((donation) => {
+        const isUpdating =
+          updatingDonationId === donation.id;
 
-        <tbody>
-          {donations.map((donation) => {
-            const isUpdating =
-              updatingDonationId === donation.id;
+        const displayName = donation.is_anonymous
+          ? "Anonymous Supporter"
+          : donation.donor_name;
 
-            return (
-              <tr key={donation.id}>
-                <td>
-                  <strong>
-                    {donation.is_anonymous
-                      ? "Anonymous"
-                      : donation.donor_name}
-                  </strong>
+        const submittedDate = new Date(
+          donation.created_at
+        ).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        });
 
-                  {donation.is_anonymous && (
-                    <span className="admin-private-name">
-                      Private: {donation.donor_name}
-                    </span>
-                  )}
-                </td>
+        return (
+          <article
+            key={donation.id}
+            className="donation-review-card"
+          >
+            <div className="donation-review-card-top">
+              <div>
+                <p className="donation-review-label">
+                  Pending Review
+                </p>
 
-                <td>
-                  {donation.donor_email || "Not provided"}
-                </td>
+                <h3>{displayName}</h3>
 
-                <td className="donation-table-amount">
-                  $
-                  {Number(donation.amount).toLocaleString(
-                    "en-US",
-                    {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    }
-                  )}
-                </td>
+                {donation.is_anonymous && (
+                  <p className="donation-private-detail">
+                    Private donor name:{" "}
+                    <strong>
+                      {donation.donor_name}
+                    </strong>
+                  </p>
+                )}
+              </div>
 
-                <td>
-                  {donation.donor_message || "No message"}
-                </td>
+              <div className="donation-review-amount">
+                $
+                {Number(
+                  donation.amount
+                ).toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </div>
+            </div>
 
-                <td>
-                  {new Date(
-                    donation.created_at
-                  ).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
-                </td>
+            <div className="donation-review-details">
+              <div>
+                <span>Email</span>
+                <strong>
+                  {donation.donor_email ||
+                    "Not provided"}
+                </strong>
+              </div>
 
-                <td>
-                  <div className="donation-action-buttons">
-                    <button
-                      type="button"
-                      className="verify-donation-button"
-                      onClick={() => onVerify(donation)}
-                      disabled={isUpdating}
-                    >
-                      {isUpdating ? "Updating..." : "Verify"}
-                    </button>
+              <div>
+                <span>Submitted</span>
+                <strong>{submittedDate}</strong>
+              </div>
+            </div>
 
-                    <button
-                      type="button"
-                      className="reject-donation-button"
-                      onClick={() => onReject(donation)}
-                      disabled={isUpdating}
-                    >
-                      Reject
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+            <div className="donation-review-message">
+              <span>Supporter Message</span>
+
+              <p>
+                {donation.donor_message ||
+                  "No message was included."}
+              </p>
+            </div>
+
+            <div className="donation-review-actions">
+              <button
+                type="button"
+                className="verify-donation-button"
+                onClick={() => onVerify(donation)}
+                disabled={isUpdating}
+              >
+                {isUpdating
+                  ? "Updating..."
+                  : "Verify Donation"}
+              </button>
+
+              <button
+                type="button"
+                className="reject-donation-button"
+                onClick={() => onReject(donation)}
+                disabled={isUpdating}
+              >
+                Reject
+              </button>
+            </div>
+          </article>
+        );
+      })}
     </div>
   );
 }
