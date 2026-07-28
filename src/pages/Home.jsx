@@ -103,6 +103,17 @@ function Home() {
   const [selectedWishlistCategory, setSelectedWishlistCategory] =
     useState("all");
 
+  const wishlistPurchaseValue = wishlistItems.reduce(
+    (total, item) =>
+      total +
+      Number(item.estimated_price || 0) *
+        Number(item.quantity_purchased || 0),
+    0
+  );
+
+  const totalRaised =
+    Number(amountCovered || 0) + wishlistPurchaseValue;
+
   useEffect(() => {
     let isMounted = true;
 
@@ -326,7 +337,7 @@ function Home() {
       "(prefers-reduced-motion: reduce)"
     ).matches;
 
-    const targetAmount = Number(amountCovered || 0);
+    const targetAmount = Number(totalRaised || 0);
     const targetProgress =
       Number(settings?.fundraising_goal) > 0
         ? Math.min(
@@ -365,7 +376,7 @@ function Home() {
     animationFrame = requestAnimationFrame(animate);
 
     return () => cancelAnimationFrame(animationFrame);
-  }, [amountCovered, loading, settings]);
+  }, [totalRaised, loading, settings]);
 
   if (loading) {
     return (
@@ -399,7 +410,7 @@ function Home() {
     totalGoal > 0
       ? Math.min(
           Math.round(
-            (amountCovered / totalGoal) * 100
+            (totalRaised / totalGoal) * 100
           ),
           100
         )
@@ -423,14 +434,14 @@ function Home() {
           Math.ceil(
             (nextMilestone / 100) *
               totalGoal -
-              amountCovered
+              totalRaised
           ),
           0
         )
       : 0;
 
   const remainingToGoal = Math.max(
-    totalGoal - amountCovered,
+    totalGoal - totalRaised,
     0
   );
 
@@ -893,10 +904,6 @@ ${shareUrl}`
 
       <section className="hero-section">
         <div className="hero-content">
-          <p className="organization-name">
-            {settings.organization_name}
-          </p>
-
           <h1>{settings.fundraiser_title}</h1>
 
           <p className="team-name">
@@ -1781,12 +1788,12 @@ ${shareUrl}`
           <article className="fundraiser-stat-card">
             <strong>
               $
-              {amountCovered.toLocaleString("en-US", {
+              {totalRaised.toLocaleString("en-US", {
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 2,
               })}
             </strong>
-            <span>Raised</span>
+            <span>Total Support</span>
           </article>
 
           <article className="fundraiser-stat-card">
